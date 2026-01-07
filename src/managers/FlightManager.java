@@ -14,12 +14,12 @@ public class FlightManager {
     }
 
     // Uçuş ekleme
-    public void addFlight(Flight flight) throws Exception {
+    public void addFlight(Flight flight) throws DuplicateFlightException {
         if (flight == null) {
             throw new IllegalArgumentException("Flight cannot be null");
         }
         if (getFlightByNumber(flight.getFlightNum()) != null) {
-            throw new Exception("Flight with number " + flight.getFlightNum() + " already exists");
+            throw new DuplicateFlightException("Flight with number " + flight.getFlightNum() + " already exists");
         }
 
         flights.add(flight);
@@ -27,7 +27,7 @@ public class FlightManager {
     }
 
     // Uçuş silme
-    public boolean removeFlight(String flightNum) throws Exception {
+    public boolean removeFlight(String flightNum) throws FlightNotFoundException {
         if (flightNum == null || flightNum.trim().isEmpty()) {
             throw new IllegalArgumentException("Flight number cannot be null or empty");
         }
@@ -35,7 +35,7 @@ public class FlightManager {
         boolean removed = flights.removeIf(f -> f.getFlightNum().equals(flightNum));
 
         if (!removed) {
-            throw new Exception("Flight " + flightNum + " not found");
+            throw new FlightNotFoundException("Flight " + flightNum + " not found");
         }
 
         System.out.println("Flight removed: " + flightNum);

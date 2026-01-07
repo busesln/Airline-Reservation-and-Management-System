@@ -1,5 +1,6 @@
 package managers;
 
+import exceptions.SeatAlreadyReservedException;
 import models.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +9,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ReservationManager {
     private List<Reservation> reservations;
     private SeatManager seatManager;
-
-    // Concurrency için lock (Multithreading Scenario 1 için)
     private ReentrantLock lock;
 
     public ReservationManager() {
@@ -21,13 +20,22 @@ public class ReservationManager {
     // Thread-safe rezervasyon oluşturma
     public Reservation makeReservation(String reservationCode, Flight flight, Passenger passenger,
             int seatRow, int seatCol) throws Exception {
+        if (reservationCode == null || reservationCode.trim().isEmpty()) {
+            throw new IllegalArgumentException("Reservation code cannot be null or empty");
+        }
+        if (flight == null) {
+            throw new IllegalArgumentException("Flight cannot be null");
+        }
+        if (passenger == null) {
+            throw new IllegalArgumentException("Passenger cannot be null");
+        }
+
         lock.lock();
         try {
-            // Koltuğu rezerve et
             boolean success = seatManager.reserveSeat(flight, seatRow, seatCol);
 
             if (!success) {
-                throw new Exception("Seat is already reserved!");
+                throw new SeatAlreadyReservedException(flight.getPlane().getSeat(seatRow, seatCol).getSeatNum());
             }
 
             Seat seat = flight.getPlane().getSeat(seatRow, seatCol);
@@ -52,7 +60,6 @@ public class ReservationManager {
                 return false;
             }
 
-            // Koltuğu serbest bırak
             seatManager.cancelSeatReservation(reservation.getSeat());
             reservations.remove(reservation);
 

@@ -1,12 +1,9 @@
 package managers;
 
 import models.*;
+import utils.Constants;
 
 public class CalculatePrice {
-
-    // Fiyat hesaplama katsayıları
-    private static final double ECONOMY_MULTIPLIER = 1.0;
-    private static final double BUSINESS_MULTIPLIER = 2.5;
 
     // Koltuk tipine göre fiyat hesaplama
     public double calculateTicketPrice(Route route, SeatType seatType) {
@@ -14,9 +11,9 @@ public class CalculatePrice {
 
         switch (seatType) {
             case ECONOMY:
-                return basePrice * ECONOMY_MULTIPLIER;
+                return basePrice * Constants.ECONOMY_MULTIPLIER;
             case BUSINESS:
-                return basePrice * BUSINESS_MULTIPLIER;
+                return basePrice * Constants.BUSINESS_MULTIPLIER;
             default:
                 return basePrice;
         }
@@ -34,15 +31,14 @@ public class CalculatePrice {
         return calculateTicketPrice(route, seat);
     }
 
-    // Bagaj ücreti hesaplama (opsiyonel)
+    // Bagaj ücreti hesaplama
     public double calculateBaggagePrice(Baggage baggage) {
         double weight = baggage.getWeight();
 
-        // 20 kg'a kadar ücretsiz, sonrası kg başına 50 TL
-        if (weight <= 20) {
+        if (weight <= Constants.MAX_FREE_BAGGAGE_KG) {
             return 0;
         } else {
-            return (weight - 20) * 50;
+            return (weight - Constants.MAX_FREE_BAGGAGE_KG) * Constants.BAGGAGE_PRICE_PER_KG;
         }
     }
 
